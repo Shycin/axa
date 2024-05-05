@@ -13,7 +13,9 @@ app.disable('x-powered-by')
 
 
 // adding Helmet to enhance your API's security
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+}));
 
 // using bodyParser to parse JSON bodies into JS objects
 app.use(bodyParser.json());
