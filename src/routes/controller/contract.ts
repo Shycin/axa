@@ -20,17 +20,22 @@ export async function get_contracts(req, res) {
     const limitPage = 10
 
     const currentPage = (req.query['page'] - 1) || 0
-    const contracts = await prisma.contracts.findMany({
-        where: {},
-        skip: currentPage * limitPage,
-        take: limitPage,
-        include: {
-            client: true
-        }
-    })
+
+    const contracts = await prisma.$transaction([
+        prisma.contracts.count(),
+        prisma.contracts.findMany({
+            where: {},
+            skip: currentPage * limitPage,
+            take: limitPage,
+            include: {
+                client: true
+            },
+        })
+    ])
+
 
     await prisma.$disconnect()
-    res.json({ message: 'Success get contracts', data: contracts });
+    res.json({ message: 'Success get contracts', data: contracts[1], count: contracts[0] });
 }
 
 
