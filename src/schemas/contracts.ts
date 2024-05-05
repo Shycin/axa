@@ -2,6 +2,7 @@ const { z } = require('zod')
 
 
 export const contratRegistrationSchema = z.object({
+    numeroOpportunite: z.string().max(255),
     referenceDossier: z.string().max(255),
     numeroSIRET: z.string().min(14).max(14),
     numeroSIREN: z.string().min(9).max(9),

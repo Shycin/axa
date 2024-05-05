@@ -1,4 +1,6 @@
 import path, { dirname } from 'path';
+import { promisify } from 'util'
+import fs from 'fs'
 
 import { PrismaClient } from '@prisma/client'
 
@@ -7,6 +9,10 @@ import { IApiRessourceSelect } from '../../dto/api';
 import { generateDocumentContracts } from '../../utils/generateFile';
 import { formatDate } from '../../utils/time';
 import { Request } from 'express';
+
+
+
+const unlinkAsync = promisify(fs.unlink)
 
 
 export async function get_contracts(req, res) {
@@ -37,8 +43,17 @@ export async function post_contracts(req: Request, res) {
         contracts = await create(prisma, req)
     } catch (error) {
         console.log(error)
+
+        for (const file of req.body['imageLien']) {
+            await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+        }
+
+        for (const file of req.body['planAdresseOperation']) {
+            await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+        }
+
         await prisma.$disconnect()
-        return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid data', details: error });
+        return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid data', details: error.meta.target });
     }
 
     const newDate = new Date()
@@ -60,6 +75,7 @@ async function create(prisma, req): Promise<IApiRessourceSelect> {
 
     return await prisma.contracts.create({
         data: {
+            numeroOpportunite: req.body['numeroOpportunite'],
             referenceDossier: req.body['referenceDossier'],
             numeroSIRET: req.body['numeroSIRET'],
             numeroSIREN: req.body['numeroSIREN'],

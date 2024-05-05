@@ -1,14 +1,30 @@
+import path, { dirname } from 'path';
+import { promisify } from 'util'
+import fs from 'fs'
+
+
 import { Request, Response, NextFunction } from 'express'
 import { z, ZodError } from "zod"
 import { StatusCodes } from "http-status-codes"
 
+const unlinkAsync = promisify(fs.unlink)
+
 export function validateData(schema: z.ZodObject<any, any>) {
     //return (req: Request, res: Response, next: NextFunction) => {
-    return (req: any, res: Response, next: NextFunction) => {
+    return async (req: any, res: Response, next: NextFunction) => {
         try {
             req.body = schema.parse(req.body);
             next();
         } catch (error) {
+
+            for (const file of req.body['imageLien']) {
+                await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+            }
+
+            for (const file of req.body['planAdresseOperation']) {
+                await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+            }
+
             if (error instanceof ZodError) {
                 const errorMessages = error.errors.map((issue: any) => ({
                     [issue.path.join('.')]: `${issue.message}`,

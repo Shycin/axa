@@ -25,7 +25,7 @@ model Client {
 }
 
 model Contracts {
-  numeroOpportunite    Int     @id @default(autoincrement())
+  numeroOpportunite    String  @unique
   referenceDossier     String
   numeroSIRET          String
   numeroSIREN          String
