@@ -39,5 +39,7 @@ model Contracts {
   planAdresseOperation String
   descriptifOperation  String
   coutOperation        Float
+  pdfFileUrl           String
+  docxFileUrl          String
   clientId             Int
 }

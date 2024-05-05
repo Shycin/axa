@@ -16,7 +16,7 @@ const maxHeight = 790
 export function createContract(contract: IApiRessourceSelect, path: string) {
     let doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true });
 
-    const writeStream = fs.createWriteStream('contract.pdf');
+    const writeStream = fs.createWriteStream(path);
     doc.pipe(writeStream);
 
     generateHeader(doc);

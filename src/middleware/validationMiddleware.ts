@@ -13,16 +13,21 @@ export function validateData(schema: z.ZodObject<any, any>) {
     //return (req: Request, res: Response, next: NextFunction) => {
     return async (req: any, res: Response, next: NextFunction) => {
         try {
+            console.log(req.body)
             req.body = schema.parse(req.body);
             next();
         } catch (error) {
 
-            for (const file of req.body['imageLien']) {
-                await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+            if (req.body['imageLien']) {
+                for (const file of req.body['imageLien']) {
+                    await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+                }
             }
 
-            for (const file of req.body['planAdresseOperation']) {
-                await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+            if (req.body['planAdresseOperation']) {
+                for (const file of req.body['planAdresseOperation']) {
+                    await unlinkAsync(path.join(dirname(require.main.filename), './public/uploads/' + file))
+                }
             }
 
             if (error instanceof ZodError) {

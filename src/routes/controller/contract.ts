@@ -44,8 +44,14 @@ export async function post_contracts(req: Request, res) {
     const prisma = new PrismaClient()
     let contracts: IApiRessourceSelect
 
+    const newDate = new Date()
+    const nameDocument = `${req.body['numeroOpportunite']}_${formatDate(newDate, '')}_${newDate.getHours()}`
+
+    const pdfName = `/public/contrats/${nameDocument}.pdf`
+    const docxName = `/public/contrats/${nameDocument}.docx`
+
     try {
-        contracts = await create(prisma, req)
+        contracts = await create(prisma, req, pdfName, docxName)
     } catch (error) {
         console.log(error)
 
@@ -61,22 +67,16 @@ export async function post_contracts(req: Request, res) {
         return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid data', details: error.meta.target });
     }
 
-    const newDate = new Date()
-    const nameDocument = `${contracts.numeroOpportunite}_${formatDate(newDate, '')}_${newDate.getHours()}`
-
-    const pdfName = `/public/contrats/${nameDocument}.pdf`
-    const docxName = `/public/contrats/${nameDocument}.docx`
-
     const pdfFile = path.join(dirname(require.main.filename), pdfName)
     const docxFile = path.join(dirname(require.main.filename), docxName)
 
     const successFiles = await generateDocumentContracts(contracts, pdfFile, docxFile)
 
     await prisma.$disconnect()
-    res.json({ message: 'Success post contracts', data: { ...contracts, contratDocuments: successFiles, contrat_pdf: pdfName, contrat_docx: docxName } });
+    res.json({ message: 'Success post contracts', data: contracts, successFiles: successFiles });
 }
 
-async function create(prisma, req): Promise<IApiRessourceSelect> {
+async function create(prisma, req, pdfName, docxName): Promise<IApiRessourceSelect> {
 
     return await prisma.contracts.create({
         data: {
@@ -93,6 +93,8 @@ async function create(prisma, req): Promise<IApiRessourceSelect> {
             planAdresseOperation: JSON.stringify(req.body['planAdresseOperation']),
             descriptifOperation: req.body['descriptifOperation'],
             coutOperation: req.body['coutOperation'],
+            pdfFileUrl: pdfName,
+            docxFileUrl: docxName,
             client: {
                 connectOrCreate: {
                     where: {
