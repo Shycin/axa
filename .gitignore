@@ -1,0 +1,14 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+more.txt
+
+public/contrats/**.docx
+public/contrats/**.pdf
+
+public/uploads/**.png
+public/uploads/**.jpeg
+public/uploads/**.jpg
+
+prisma/database/**
