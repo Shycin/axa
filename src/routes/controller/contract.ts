@@ -21,18 +21,59 @@ export async function get_contracts(req, res) {
 
     const currentPage = (req.query['page'] - 1) || 0
 
+    const orderby = []
+    if (req.query['client']) {
+        orderby.push({
+            client: {
+                nom: req.query['client'],
+            }
+        })
+    }
+    if (req.query['referenceDossier']) {
+        orderby.push({ referenceDossier: req.query['referenceDossier'] })
+    }
+    if (req.query['numeroOpportunite']) {
+        orderby.push({ numeroOpportunite: req.query['numeroOpportunite'] })
+    }
+
+
+    const whereClause = {}
+    if (req.query['nameSearch']) {
+        whereClause['client'] = {
+            OR: [
+                { nom: { contains: req.query['nameSearch'] } },
+                { prenom: { contains: req.query['nameSearch'] } }
+            ]
+        }
+    }
+    if (req.query['referenceDossierSearch']) {
+        whereClause['referenceDossier'] = { contains: req.query['referenceDossierSearch'] }
+    }
+    if (req.query['numeroOpportuniteSearch']) {
+        whereClause['numeroOpportunite'] = { contains: req.query['numeroOpportuniteSearch'] }
+    }
+
     const contracts = await prisma.$transaction([
-        prisma.contracts.count(),
+        prisma.contracts.count({
+            where: { ...whereClause },
+            orderBy: [
+                ...orderby,
+                { date: req.query['date'] || 'desc' }
+            ],
+        }),
         prisma.contracts.findMany({
-            where: {},
+            where: { ...whereClause },
+            orderBy: [
+                ...orderby,
+                { date: req.query['date'] || 'desc' }
+            ],
             skip: currentPage * limitPage,
             take: limitPage,
             include: {
-                client: true
+                client: true,
             },
         })
     ])
-
 
     await prisma.$disconnect()
     res.json({ message: 'Success get contracts', data: contracts[1], count: contracts[0] });

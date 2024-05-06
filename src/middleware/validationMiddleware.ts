@@ -10,10 +10,8 @@ import { StatusCodes } from "http-status-codes"
 const unlinkAsync = promisify(fs.unlink)
 
 export function validateData(schema: z.ZodObject<any, any>) {
-    //return (req: Request, res: Response, next: NextFunction) => {
-    return async (req: any, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            console.log(req.body)
             req.body = schema.parse(req.body);
             next();
         } catch (error) {

@@ -25,12 +25,12 @@ model Client {
 }
 
 model Contracts {
-  numeroOpportunite    String  @unique
+  numeroOpportunite    String   @unique
   referenceDossier     String
   numeroSIRET          String
   numeroSIREN          String
   affaire              String
-  client               Client  @relation(fields: [clientId], references: [clientId])
+  client               Client   @relation(fields: [clientId], references: [clientId])
   intermediaire        String
   descriptionSuccincte String
   imageLien            String
@@ -41,5 +41,6 @@ model Contracts {
   coutOperation        Float
   pdfFileUrl           String
   docxFileUrl          String
+  date                 DateTime @default(now())
   clientId             Int
 }

@@ -27,7 +27,14 @@ export const contratRegistrationSchema = z.object({
 });
 
 export const contractSearchSchema = z.object({
-    page: z.coerce.number().positive().nonnegative().nullish()
+    page: z.coerce.number().positive().nonnegative().nullish(),
+    numeroOpportunite: z.coerce.string().regex(/(asc)|(desc)/).nullish(),
+    referenceDossier: z.coerce.string().regex(/(asc)|(desc)/).nullish(),
+    client: z.coerce.string().regex(/(asc)|(desc)/).nullish(),
+    date: z.coerce.string().regex(/(asc)|(desc)/).nullish(),
+    nameSearch: z.coerce.string().nullish(),
+    referenceDossierSearch: z.coerce.string().nullish(),
+    numeroOpportuniteSearch: z.coerce.string().nullish(),
 });
 
 export const clientSearchSchema = z.object({
